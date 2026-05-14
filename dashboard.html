@@ -1,0 +1,1155 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Neptun Globe Kft. — Hirdetési Riport Dashboard · dropline</title>
+<meta name="description" content="A Dropline ügynökség havi hirdetési riport dashboardja a Neptun Globe Kft. portfolió számára." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Satoshi','Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#090909;color:#fff;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+:root{
+  --dl-black:#090909;
+  --dl-charcoal:#141414;
+  --dl-surface:#1a1a1a;
+  --dl-surface-2:#222;
+  --dl-blue:#001AFF;
+  --dl-gray:#b3b3b3;
+  --dl-gray-dim:#6b6b6b;
+  --dl-border:rgba(255,255,255,0.08);
+  --dl-border-strong:rgba(255,255,255,0.18);
+  --ng-green:#00CC0A;
+  --md-yellow:#FFAE10;
+  --sipom-blue:#173057;   /* deep brand blue — logo bg, panel tone */
+  --sipom-mid:#4674AF;    /* mid brand blue — readable accent on dark */
+  --sipom-light:#7AA3D5;  /* light brand blue — soft accent text */
+  --sipom-red:#4674AF;    /* legacy var, aliased to mid blue — no red in palette */
+  --le-gold:#9E854B;
+  --le-cream:#f3e8d2;
+  --good:#00CC0A;
+  --warn:#FFAE10;
+  --bad:#FF4D4D;
+  --accent:#001AFF;
+}
+
+/* ===== CURSOR AURA — adapts to active brand, GPU-accelerated transform ===== */
+.cursor-aura{
+  position:fixed;left:0;top:0;
+  width:1100px;height:1100px;
+  margin-left:-550px;margin-top:-550px;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle at center, var(--aura-color,rgba(0,26,255,0.26)) 0%, transparent 60%);
+  will-change:transform;
+  transform:translate3d(50vw,30vh,0);
+  transition:background 0.6s ease;
+  contain:layout paint;
+}
+@media (max-width:700px){
+  .cursor-aura{width:700px;height:700px;margin-left:-350px;margin-top:-350px;opacity:0.7}
+}
+@media (prefers-reduced-motion: reduce){
+  .cursor-aura{display:none}
+}
+
+.wrap{max-width:1320px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+@media (max-width:600px){.wrap{padding:0 18px}}
+
+/* ============================================================ */
+/* HEADER — sticky, glassy, brand-aware */
+/* ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(9,9,9,0.78);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--dl-border);
+}
+.topbar-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;gap:24px;flex-wrap:wrap;
+}
+.brand-mark{
+  display:flex;align-items:center;gap:14px;
+}
+.brand-mark img{height:20px;width:auto}
+.brand-mark .divider{width:1px;height:22px;background:var(--dl-border-strong)}
+.brand-mark .doc-title{font-size:13.5px;font-weight:600;color:#fff;letter-spacing:-0.005em}
+.brand-mark .doc-sub{font-size:11px;color:var(--dl-gray);letter-spacing:0.08em;text-transform:uppercase;font-weight:500;margin-top:2px}
+
+.period-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:999px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--dl-border-strong);
+  font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.85);
+}
+.period-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+
+/* ============================================================ */
+/* HERO */
+/* ============================================================ */
+.hero{
+  padding:80px 0 40px;position:relative;text-align:left;
+}
+.hero h1{
+  font-size:clamp(34px,5vw,62px);line-height:1.1;letter-spacing:-0.025em;
+  font-weight:800;margin:0 0 18px;max-width:920px;
+}
+.hero h1 em{font-style:normal;color:var(--accent-color,var(--accent));transition:color 0.5s ease}
+.hero p{
+  font-size:clamp(15px,1.2vw,18px);line-height:1.6;
+  color:rgba(255,255,255,0.65);max-width:680px;margin:0 0 36px;
+}
+.eyebrow{
+  display:inline-block;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;
+  font-weight:600;color:var(--accent-color,var(--accent));margin-bottom:18px;
+}
+
+/* ============================================================ */
+/* BRAND FILTER PILLS */
+/* ============================================================ */
+.brand-tabs{
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px;
+  padding:6px;background:var(--dl-charcoal);border:1px solid var(--dl-border);border-radius:999px;width:fit-content;max-width:100%;
+}
+.brand-tab{
+  padding:10px 20px;border-radius:999px;font-size:13.5px;font-weight:600;
+  color:rgba(255,255,255,0.65);
+  transition:color 0.3s ease,background 0.3s ease,transform 0.3s ease;
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+}
+.brand-tab:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.brand-tab.active{color:#fff;background:var(--dl-surface-2)}
+.brand-tab .tab-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.brand-tab[data-brand="all"].active{background:var(--accent);color:#fff}
+.brand-tab[data-brand="all"].active .tab-dot{background:#fff}
+.brand-tab[data-brand="neptun"] .tab-dot{background:var(--ng-green)}
+.brand-tab[data-brand="mosodepo"] .tab-dot{background:var(--md-yellow)}
+.brand-tab[data-brand="sipom"] .tab-dot{background:linear-gradient(135deg,var(--sipom-blue) 0%,var(--sipom-light) 100%)}
+.brand-tab[data-brand="neptun"].active{background:rgba(0,204,10,0.12);color:var(--ng-green)}
+.brand-tab[data-brand="mosodepo"].active{background:rgba(255,174,16,0.12);color:var(--md-yellow)}
+.brand-tab[data-brand="sipom"].active{background:rgba(70,116,175,0.18);color:var(--sipom-mid)}
+
+/* ============================================================ */
+/* SUMMARY KPI STRIP (portfolio-wide) */
+/* ============================================================ */
+.summary-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  margin-bottom:60px;
+}
+@media (max-width:900px){.summary-strip{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.summary-strip{grid-template-columns:1fr}}
+.summary-card{
+  padding:22px 22px;border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);
+  border:1px solid var(--dl-border);
+  position:relative;overflow:hidden;
+}
+.summary-card .lbl{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:600;color:var(--dl-gray-dim);margin-bottom:10px}
+.summary-card .val{font-size:clamp(26px,3vw,38px);font-weight:800;letter-spacing:-0.02em;line-height:1}
+.summary-card .sub{font-size:12.5px;color:var(--dl-gray);margin-top:6px}
+.summary-card .accent-dot{position:absolute;top:18px;right:18px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+
+/* ============================================================ */
+/* BRAND SECTIONS */
+/* ============================================================ */
+.brand-section{
+  padding:56px 0 32px;
+  border-top:1px solid var(--dl-border);
+  position:relative;
+  display:none;
+}
+.brand-section.visible{display:block;animation:fadeIn 0.4s ease}
+/* Sipom: subtle deep-blue brand tone in the section background */
+.brand-section[data-brand="sipom"]::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:
+    radial-gradient(800px 500px at 15% 0%, rgba(23,48,87,0.45), transparent 55%),
+    radial-gradient(600px 400px at 100% 100%, rgba(70,116,175,0.18), transparent 60%);
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:36px;gap:24px;flex-wrap:wrap;
+}
+.section-head h2{
+  font-size:clamp(28px,3.6vw,44px);font-weight:800;letter-spacing:-0.022em;line-height:1.15;margin:0;
+}
+.section-head .meta{
+  font-size:12.5px;color:var(--dl-gray);
+  padding:8px 14px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--dl-border);border-radius:999px;
+}
+.section-logo{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:54px;width:auto;margin-bottom:18px;opacity:0.95;
+  background:rgba(255,255,255,0.03);border:1px solid var(--dl-border);
+  padding:8px 18px;border-radius:12px;
+}
+.section-logo > img{height:32px;width:auto;display:block;max-width:none}
+.section-logo.logo-mosodepo{background:#1a1a1a;border-color:rgba(255,174,16,0.25)}
+.section-logo.logo-sipom{background:#173057;border-color:rgba(122,163,213,0.30);padding:6px 22px}
+.section-logo.logo-sipom > img{height:34px}
+.section-logo.logo-leather{background:#000000;border-color:rgba(158,133,75,0.3)}
+
+/* KPI Grid */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  margin-bottom:36px;
+}
+@media (max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.kpi-grid{grid-template-columns:1fr}}
+.kpi-card{
+  padding:24px;border-radius:18px;
+  background:var(--dl-charcoal);border:1px solid var(--dl-border);
+  transition:transform 0.3s ease,border-color 0.3s ease,background 0.3s ease;
+}
+.kpi-card:hover{transform:translateY(-3px);border-color:var(--dl-border-strong);background:#171717}
+.kpi-card .kpi-lbl{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:600;color:var(--dl-gray);margin-bottom:14px}
+.kpi-card .kpi-val{font-size:clamp(28px,3vw,38px);font-weight:800;letter-spacing:-0.02em;line-height:1.05}
+.kpi-card .kpi-unit{font-size:14px;font-weight:600;color:var(--dl-gray);margin-left:4px}
+.kpi-card .kpi-sub{font-size:12.5px;color:var(--dl-gray);margin-top:8px;line-height:1.45}
+.kpi-card.highlight{border-color:var(--brand-accent,var(--accent));background:linear-gradient(180deg,rgba(0,26,255,0.06),rgba(0,26,255,0.01))}
+.kpi-card.highlight .kpi-val{color:var(--brand-accent,var(--accent))}
+.kpi-card.good{border-color:rgba(0,204,10,0.5);background:linear-gradient(180deg,rgba(0,204,10,0.06),rgba(0,204,10,0.01))}
+.kpi-card.good .kpi-val{color:var(--good)}
+.kpi-card.warn{border-color:rgba(255,174,16,0.5);background:linear-gradient(180deg,rgba(255,174,16,0.06),rgba(255,174,16,0.01))}
+.kpi-card.warn .kpi-val{color:var(--warn)}
+.kpi-card.bad{border-color:rgba(255,77,77,0.5);background:linear-gradient(180deg,rgba(255,77,77,0.06),rgba(255,77,77,0.01))}
+.kpi-card.bad .kpi-val{color:var(--bad)}
+/* Sipom: blue brand frame + gradient bg + light-blue accent value */
+.kpi-card.kpi-sipom{
+  border-color:rgba(70,116,175,0.55);
+  background:linear-gradient(180deg,rgba(23,48,87,0.22),rgba(70,116,175,0.05));
+}
+.kpi-card.kpi-sipom .kpi-val{color:var(--sipom-light)}
+.kpi-card.kpi-sipom .kpi-lbl{color:var(--sipom-mid)}
+
+/* Two-column layouts */
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-bottom:36px}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+
+.panel{
+  padding:28px;border-radius:20px;
+  background:var(--dl-charcoal);border:1px solid var(--dl-border);
+}
+.panel h3{
+  font-size:18px;font-weight:700;letter-spacing:-0.01em;margin:0 0 6px;
+}
+.panel .panel-sub{font-size:12.5px;color:var(--dl-gray-dim);text-transform:uppercase;letter-spacing:0.14em;font-weight:600;margin-bottom:18px}
+.panel p{font-size:14.5px;line-height:1.65;color:rgba(255,255,255,0.78);margin:0 0 12px}
+.panel p:last-child{margin-bottom:0}
+.panel strong{color:#fff;font-weight:700}
+
+/* Chart container */
+.chart-wrap{
+  position:relative;height:300px;margin-top:10px;
+}
+.chart-wrap.tall{height:360px}
+
+/* Recommendation panel */
+.recommendations{margin-top:24px}
+.rec-item{
+  padding:22px;border-radius:16px;background:rgba(255,255,255,0.03);
+  border:1px solid var(--dl-border);margin-bottom:12px;
+  display:grid;grid-template-columns:48px 1fr;gap:18px;align-items:flex-start;
+}
+.rec-item .num{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--brand-accent,var(--accent));color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;
+}
+.rec-item h4{font-size:15px;font-weight:700;margin:0 0 8px;color:#fff}
+.rec-item p{font-size:13.5px;line-height:1.6;color:rgba(255,255,255,0.72);margin:0}
+/* Sipom-flavoured recommendation: blue→light-blue gradient number bubble + blue border tint */
+.rec-item.rec-sipom{border-color:rgba(70,116,175,0.35);background:rgba(23,48,87,0.10)}
+.rec-item.rec-sipom .num{background:linear-gradient(135deg,var(--sipom-blue) 0%,var(--sipom-mid) 60%,var(--sipom-light) 100%);color:#fff}
+
+/* Empty state */
+.empty-state{
+  padding:80px 28px;text-align:center;
+  background:var(--dl-charcoal);border:1px dashed var(--dl-border-strong);border-radius:20px;
+}
+.empty-state h3{font-size:20px;font-weight:700;margin:0 0 10px}
+.empty-state p{font-size:14px;color:var(--dl-gray);max-width:480px;margin:0 auto;line-height:1.6}
+
+/* Region grid — two columns of county lists */
+.region-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:24px;
+}
+@media (max-width:780px){.region-grid{grid-template-columns:1fr;gap:24px}}
+.region-list-title{font-size:12px;font-weight:700;color:var(--dl-gray);margin:0 0 14px;text-transform:uppercase;letter-spacing:0.14em}
+.region-list{display:flex;flex-direction:column;gap:9px}
+.region-row{
+  display:grid;grid-template-columns:1.4fr 1.4fr auto;gap:12px;align-items:center;
+  font-size:13px;
+}
+.region-row .rr-name{color:rgba(255,255,255,0.78);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.region-row .rr-bar{height:8px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+.region-row .rr-fill{height:100%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.35) 100%);border-radius:999px;transition:width 0.4s ease}
+.region-row .rr-num{font-weight:700;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.region-row .rr-num em{color:var(--dl-gray);font-style:normal;font-weight:500;font-size:11.5px;margin-left:2px}
+.region-footnote{font-size:12.5px;color:var(--dl-gray);margin:24px 0 0;line-height:1.6}
+.region-footnote strong{color:#fff}
+
+/* Funnel viz */
+.funnel{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.funnel-row{
+  display:grid;grid-template-columns:140px 1fr 90px;gap:14px;align-items:center;font-size:13px;
+}
+.funnel-bar{
+  height:30px;background:linear-gradient(90deg,var(--brand-accent,var(--accent)) 0%,rgba(255,255,255,0.05) 100%);
+  border-radius:8px;position:relative;overflow:hidden;
+}
+.funnel-row .lbl{color:var(--dl-gray);font-weight:500}
+.funnel-row .num{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+/* Glossary (collapsible) */
+.glossary-section{padding:40px 0 0;margin-top:40px;border-top:1px solid var(--dl-border)}
+.glossary-details{
+  background:var(--dl-charcoal);border:1px solid var(--dl-border);border-radius:18px;
+  overflow:hidden;
+}
+.glossary-details > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  padding:22px 26px;
+  font-size:15.5px;font-weight:600;color:#fff;
+  transition:background 0.3s ease;
+}
+.glossary-details > summary::-webkit-details-marker{display:none}
+.glossary-details > summary:hover{background:rgba(255,255,255,0.03)}
+.glossary-details .g-icon{
+  flex:none;width:30px;height:30px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;
+}
+.glossary-details .g-title{flex:1}
+.glossary-details .g-chevron{
+  flex:none;font-size:14px;color:var(--dl-gray);
+  transition:transform 0.3s ease;
+}
+.glossary-details[open] .g-chevron{transform:rotate(180deg)}
+.glossary-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:18px;
+  padding:0 26px 28px;
+}
+@media (max-width:900px){.glossary-grid{grid-template-columns:1fr}}
+.g-item{
+  padding:18px 20px;border-radius:14px;
+  background:rgba(255,255,255,0.02);border:1px solid var(--dl-border);
+}
+.g-item h4{
+  font-size:13.5px;font-weight:700;margin:0 0 8px;color:#fff;
+  letter-spacing:-0.005em;
+}
+.g-item p{font-size:13px;line-height:1.55;color:rgba(255,255,255,0.7);margin:0}
+.g-item strong{color:#fff;font-weight:600}
+
+/* Footer */
+.footer{
+  padding:60px 0 80px;text-align:center;border-top:1px solid var(--dl-border);margin-top:60px;
+}
+.footer p{font-size:12.5px;color:var(--dl-gray-dim);margin:0 0 16px}
+.footer img{height:18px;width:auto;margin:0 auto;opacity:0.7}
+
+/* Brand-specific accent colors */
+body.brand-active-neptun{--brand-accent:var(--ng-green);--aura-color:rgba(0,204,10,0.16)}
+body.brand-active-mosodepo{--brand-accent:var(--md-yellow);--aura-color:rgba(255,174,16,0.16)}
+body.brand-active-sipom{--brand-accent:var(--sipom-light);--aura-color:rgba(70,116,175,0.20)}
+body.brand-active-all{--brand-accent:var(--accent);--aura-color:rgba(0,26,255,0.22)}
+
+body{--brand-accent:var(--accent)}
+
+/* Hero accent color via CSS var */
+.hero h1 em{color:var(--brand-accent)}
+
+/* Small responsive tweaks */
+@media (max-width:600px){
+  .hero{padding:48px 0 24px}
+  .topbar-inner{padding:14px 18px}
+  .brand-mark .doc-title{font-size:12.5px}
+  .section-head{margin-bottom:24px}
+  .panel{padding:20px}
+  .rec-item{grid-template-columns:36px 1fr;gap:12px;padding:18px}
+  .rec-item .num{width:30px;height:30px;font-size:12px}
+}
+</style>
+</head>
+<body class="brand-active-all">
+
+<div class="cursor-aura" aria-hidden="true"></div>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-mark">
+      <img src="https://cdn.prod.website-files.com/67696bf6a7f399ccfcfd653f/676976986befa745c559cddd_Dropline_logo_web.png" alt="dropline">
+      <div class="divider"></div>
+      <div>
+        <div class="doc-title">Neptun Globe Kft.</div>
+        <div class="doc-sub">Havi hirdetési riport</div>
+      </div>
+    </div>
+    <div class="period-pill">
+      <span class="dot"></span>
+      <span id="period-label">2026. április 1. – május 14.</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Riport · 2026. április 1. – május 14.</span>
+    <h1>Hirdetési <em>eredmények</em></h1>
+    <p>A Neptun Globe Kft. márkáinak hirdetési teljesítménye április elejétől a riport készítésének napjáig (2026. május 14.). A márkák közötti szűrőkkel külön-külön is megnézhetők a kampányok eredményei.</p>
+
+    <!-- Brand filter -->
+    <div class="brand-tabs" role="tablist">
+      <button class="brand-tab active" data-brand="all" role="tab"><span class="tab-dot"></span>Teljes portfolió</button>
+      <button class="brand-tab" data-brand="neptun" role="tab"><span class="tab-dot"></span>Neptun Globe</button>
+      <button class="brand-tab" data-brand="mosodepo" role="tab"><span class="tab-dot"></span>Mosódepó</button>
+      <button class="brand-tab" data-brand="sipom" role="tab"><span class="tab-dot"></span>Sipom</button>
+    </div>
+
+    <!-- Portfolio summary (visible only on "all") -->
+    <div class="summary-strip" id="summary-strip">
+      <div class="summary-card">
+        <div class="lbl">Hirdetési költés</div>
+        <div class="val">907 234 Ft</div>
+        <div class="sub">3 aktív Meta kampány összesen</div>
+      </div>
+      <div class="summary-card">
+        <div class="lbl">Bevétel a hirdetésekből</div>
+        <div class="val">3 441 688 Ft</div>
+        <div class="sub">Vásárlási érték a webshopokban</div>
+      </div>
+      <div class="summary-card">
+        <div class="lbl">Átlagos ROAS</div>
+        <div class="val" style="color:var(--good)">4,12×</div>
+        <div class="sub">Minden 1 Ft hirdetésre 4,12 Ft bevétel</div>
+      </div>
+      <div class="summary-card">
+        <div class="lbl">Vásárlás és érdeklődő</div>
+        <div class="val">214</div>
+        <div class="sub">150 webes vásárlás + 64 B2B érdeklődő</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEPTUN GLOBE SECTION ============ -->
+<section class="brand-section visible" id="section-neptun" data-brand="neptun">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div>
+        <img class="section-logo" src="https://neptunglobe.hu/images/rendszer/NeptunGlobe_Primary-dark_bg-full_vertical.svg" alt="Neptun Globe">
+        <h2>Neptun Globe — <em style="color:var(--ng-green)">Facebook hirdetések</em></h2>
+      </div>
+      <div class="meta">Kampány: <strong style="color:#fff">Prospecting_CBO | ngshop.hu</strong></div>
+    </div>
+
+    <!-- Performance summary panel (pptx style) -->
+    <div class="panel" style="margin-bottom:28px">
+      <h3>Hatékonysági mutatók és trendek</h3>
+      <div class="panel-sub">Facebook termékkategóriák hirdetése · Prospecting CBO kampány</div>
+      <p>A vizsgált időszakban a Meta hirdetések egyértelműen az ngshop.hu értékesítési céljait szolgálták, és a kampányteljesítmény alapján jól látható, hogy a rendszer stabilan működik. A Prospecting_CBO | ngshop.hu kampány összesen <strong>459 163 megjelenést</strong> és <strong>81 029 elérést</strong> generált.</p>
+      <p>A kampány <strong>240 webes kosárba helyezést</strong> és <strong>75 webes vásárlást</strong> eredményezett, miközben a teljes költés <strong>220 199 Ft</strong> volt. Az egy vásárlásra jutó költség így <strong>2 936 Ft</strong>, ami kifejezetten kedvező értéknek számít, különösen e-kereskedelmi környezetben. A vásárlások összesített konverziós értéke <strong>1 706 507 Ft</strong> volt, a kampány átlagos vásárlási értéke pedig <strong>22 753 Ft</strong> körül alakult. A <strong>7,75-ös ROAS</strong> kiemelkedően erős teljesítményt jelez, vagyis a Meta hirdetések az időszakban nemcsak forgalmat, hanem rendkívül hatékony árbevételt is termeltek.</p>
+    </div>
+
+    <!-- Meta KPI grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card highlight" style="--brand-accent:var(--ng-green)">
+        <div class="kpi-lbl">ROAS</div>
+        <div class="kpi-val">7,75<span class="kpi-unit">×</span></div>
+        <div class="kpi-sub">Minden 1 Ft költésre 7,75 Ft bevétel</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költés</div>
+        <div class="kpi-val">220 199<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">Teljes hirdetési büdzsé az időszakban</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Konverziós érték</div>
+        <div class="kpi-val">1 706 507<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">A vásárlások összesített bevétele</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Webes vásárlás</div>
+        <div class="kpi-val">75</div>
+        <div class="kpi-sub">Átlagos kosárérték: 22 753 Ft</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Megjelenés</div>
+        <div class="kpi-val">459 163</div>
+        <div class="kpi-sub">81 029 különböző ember látta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kattintás</div>
+        <div class="kpi-val">7 295</div>
+        <div class="kpi-sub">CTR 1,59% · átlagos kattintási költség 30 Ft</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kosárba helyezés</div>
+        <div class="kpi-val">240</div>
+        <div class="kpi-sub">Ebből 31% lett vásárlás</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költség egy vásárlásra</div>
+        <div class="kpi-val">2 936<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">1000 megjelenés ára (CPM): 480 Ft</div>
+      </div>
+    </div>
+
+    <!-- Funnel + GA4 -->
+    <div class="split">
+      <div class="panel">
+        <h3>Hirdetési útvonal — a megjelenéstől a vásárlásig</h3>
+        <div class="panel-sub">Hogyan halad a felhasználó a hirdetésen át</div>
+        <p>A Meta hirdetések jelentős mennyiségű emberhez jutottak el az időszakban. Több mint 459 ezer megjelenés és 7 295 kattintás után a felhasználók a kosárba helyezésen keresztül jutottak el a vásárlásig. A „kosárba helyezésből vásárlássá" váló arány <strong>31%</strong> — ez egészséges szint, amely azt mutatja, hogy aki valóban érdeklődik a termék iránt, az nagy eséllyel meg is rendeli.</p>
+        <div class="funnel" id="ng-funnel">
+          <div class="funnel-row"><span class="lbl">Megjelenés</span><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.1) 100%)"></div><span class="num">459 163</span></div>
+          <div class="funnel-row"><span class="lbl">Elérés</span><div class="funnel-bar" style="width:18%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.1) 100%)"></div><span class="num">81 029</span></div>
+          <div class="funnel-row"><span class="lbl">Kattintás</span><div class="funnel-bar" style="width:5%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.1) 100%)"></div><span class="num">7 295</span></div>
+          <div class="funnel-row"><span class="lbl">Kosárba helyezés</span><div class="funnel-bar" style="width:1.2%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.1) 100%)"></div><span class="num">240</span></div>
+          <div class="funnel-row"><span class="lbl">Vásárlás</span><div class="funnel-bar" style="width:0.4%;background:linear-gradient(90deg,var(--ng-green) 0%,rgba(0,204,10,0.1) 100%)"></div><span class="num">75</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Weboldal havi forgalma — forgalom forrása</h3>
+        <div class="panel-sub">ngshop.hu · Google Analytics</div>
+        <p>A vizsgált időszakban a weboldal forgalma több csatorna együttes hatására növekedett, és jól látszik, hogy a fizetett és az organikus források együttesen járultak hozzá a látogatottság és a vásárlások számának emelkedéséhez. Az időszakban összesen <strong>4 838 munkamenet</strong> érkezett a weboldalra, és <strong>94 vásárlási esemény</strong> történt.</p>
+        <p>A legnagyobb forgalmat továbbra is a fizetett Facebook csatorna generálta, <strong>1 676 felhasználóval</strong> — ami az összes forgalom körülbelül 46%-a. Ez egyértelműen mutatja a Meta hirdetések jelentőségét a webshop forgalmának építésében. A facebook remarketing további 572 látogatót és 14 vásárlást hozott.</p>
+        <div class="chart-wrap">
+          <canvas id="ng-traffic-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- GA4 Demographics -->
+    <div class="panel" style="margin-bottom:36px">
+      <h3>Weboldal havi forgalma — területi eloszlás</h3>
+      <div class="panel-sub">Felhasználók megyénként · ngshop.hu · Google Analytics</div>
+      <p>A vizsgált időszakban a weboldal forgalma földrajzi szempontból továbbra is erősen Budapest-központú maradt, ugyanakkor több vidéki régióból is jelentős aktivitás volt megfigyelhető. Összesen <strong>3 604 aktív felhasználó</strong> érkezett a weboldalra, amelyből <strong>1 543 felhasználó (42,8%) Budapestről</strong> látogatta meg az oldalt. Ez a fővárost továbbra is a legfontosabb forgalmi forrássá teszi.</p>
+      <p>A második legnagyobb felhasználói bázis Pest megyéből érkezett <strong>332 látogatóval</strong> (9,2%), ezt követte Győr-Moson-Sopron megye 160 felhasználóval (4,4%), majd Bács-Kiskun megye 127 látogatóval (3,5%). A további jelentősebb forgalmat generáló régiók között szerepel még Fejér, Szabolcs-Szatmár-Bereg, Zala, Veszprém, Vas, Komárom-Esztergom és Borsod-Abaúj-Zemplén megye is.</p>
+
+      <div class="region-grid">
+        <div>
+          <h4 class="region-list-title">Felhasználók megyénként — 1–10.</h4>
+          <div class="region-list">
+            <div class="region-row"><span class="rr-name">Budapest</span><div class="rr-bar"><div class="rr-fill" style="width:100%"></div></div><span class="rr-num">1 543 <em>(42,8%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Pest</span><div class="rr-bar"><div class="rr-fill" style="width:21%"></div></div><span class="rr-num">332 <em>(9,2%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Győr-Moson-Sopron</span><div class="rr-bar"><div class="rr-fill" style="width:10%"></div></div><span class="rr-num">160 <em>(4,4%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Bács-Kiskun</span><div class="rr-bar"><div class="rr-fill" style="width:8%"></div></div><span class="rr-num">127 <em>(3,5%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Fejér</span><div class="rr-bar"><div class="rr-fill" style="width:7%"></div></div><span class="rr-num">108 <em>(3,0%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Szabolcs-Szatmár-Bereg</span><div class="rr-bar"><div class="rr-fill" style="width:7%"></div></div><span class="rr-num">102 <em>(2,8%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Zala</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">95 <em>(2,6%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Veszprém</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">94 <em>(2,6%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Komárom-Esztergom</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">93 <em>(2,6%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Vas</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">92 <em>(2,6%)</em></span></div>
+          </div>
+        </div>
+        <div>
+          <h4 class="region-list-title">Felhasználók megyénként — 11–20.</h4>
+          <div class="region-list">
+            <div class="region-row"><span class="rr-name">Borsod-Abaúj-Zemplén</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">86 <em>(2,4%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Baranya</span><div class="rr-bar"><div class="rr-fill" style="width:6%"></div></div><span class="rr-num">85 <em>(2,4%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Hajdú-Bihar</span><div class="rr-bar"><div class="rr-fill" style="width:5%"></div></div><span class="rr-num">80 <em>(2,2%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Csongrád-Csanád</span><div class="rr-bar"><div class="rr-fill" style="width:5%"></div></div><span class="rr-num">76 <em>(2,1%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Somogy</span><div class="rr-bar"><div class="rr-fill" style="width:4%"></div></div><span class="rr-num">67 <em>(1,9%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Békés</span><div class="rr-bar"><div class="rr-fill" style="width:4%"></div></div><span class="rr-num">65 <em>(1,8%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Heves</span><div class="rr-bar"><div class="rr-fill" style="width:3%"></div></div><span class="rr-num">54 <em>(1,5%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Jász-Nagykun-Szolnok</span><div class="rr-bar"><div class="rr-fill" style="width:3%"></div></div><span class="rr-num">53 <em>(1,5%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Tolna</span><div class="rr-bar"><div class="rr-fill" style="width:3%"></div></div><span class="rr-num">52 <em>(1,4%)</em></span></div>
+            <div class="region-row"><span class="rr-name">Nógrád</span><div class="rr-bar"><div class="rr-fill" style="width:2%"></div></div><span class="rr-num">25 <em>(0,7%)</em></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="region-footnote">A magyar megyékből érkező forgalom adja a teljes látogatottság <strong>96%-át</strong>. A fennmaradó 4% külföldről érkezett (jellemzően Németország, Ausztria, Egyesült Királyság), ami eladást nem hozott.</p>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="recommendations">
+      <h3 style="font-size:20px;font-weight:700;margin:0 0 18px;color:#fff">Következő lépések</h3>
+
+      <div class="rec-item" style="--brand-accent:var(--ng-green)">
+        <div class="num">1</div>
+        <div>
+          <h4>Facebook hirdetések további optimalizálása</h4>
+          <p>Az eredmények alapján a Meta hirdetések kiemelkedően hatékonyan működnek, ezért a következő időszak egyik legfontosabb feladata a kreatívok folyamatos frissítése. A kampány közel <strong>nyolcszoros megtérülést (ROAS)</strong> mutat, ami kifejezetten erős teljesítménynek számít. Ez azt jelenti, hogy a rendszer már a jelenlegi költési szinten is stabilan képes bevételt termelni, így indokolt lehet a kampány büdzsééjének felfelé léptetése. A kreatívok rendszeres cseréjével és új hirdetési formátumok tesztelésével a kampány tovább skálázható.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--ng-green)">
+        <div class="num">2</div>
+        <div>
+          <h4>Google hirdetések bővítése</h4>
+          <p>A Google hirdetések esetében más stratégiai megközelítés szükséges. A Shopping és Performance Max termékhirdetések ebben a szegmensben csak akkor tudnak hatékonyan működni, ha a hirdetési költés magasabb szintre kerül. A jelenlegi piaci környezetben a verseny rendkívül erős, így alacsonyabb költési szint mellett a hirdetések nem jelennek meg elegendő alkalommal ahhoz, hogy stabil forgalmat vagy konverziót generáljanak. Amennyiben a költségkeret változatlan marad, célszerűbb kizárólag keresési kampányokat futtatni.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--ng-green)">
+        <div class="num">3</div>
+        <div>
+          <h4>Vidéki vevőkör célzott megszólítása</h4>
+          <p>A 42,8%-os budapesti dominancia mellett Pest, Győr-Moson-Sopron, Bács-Kiskun és Fejér megye együttesen további 20%-ot tesz ki. Ez azt jelzi, hogy a vidéki műhely- és szervizes szakemberek is folyamatosan jelen vannak a webshopon. Külön regionális hirdetési csoport indítása segíthet abban, hogy a Budapesten kívüli forgalom és vásárlás aránya is növekedjen.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--ng-green)">
+        <div class="num">4</div>
+        <div>
+          <h4>Kiemelt termékkategóriák kommunikációja</h4>
+          <p>A jelenlegi kampánystruktúra termékkategóriákra épít, és jól mutatja, hogy mely típusú termékek vonzzák leginkább a látogatók figyelmét. A következő időszakban érdemes a legjobban teljesítő termékcsaládokat külön kreatívokkal megszólítani — különösen a féktisztító és világítástechnikai termékeket, ahol a vásárlói szándék a legerősebb.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ MOSÓDEPÓ SECTION ============ -->
+<section class="brand-section visible" id="section-mosodepo" data-brand="mosodepo">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div>
+        <div class="section-logo logo-mosodepo"><img src="https://www.mosodepo.hu/!common_design/custom/mosodepo.unas.hu/element/layout_hu_header_logo-300x80_1_default_retina.png?time=1690443005" alt="Mosódepó"></div>
+        <h2>Mosódepó — <em style="color:var(--md-yellow)">Facebook hirdetések</em></h2>
+      </div>
+      <div class="meta">Kampány: <strong style="color:#fff">Mosodeop | Adv+ Sales | 0402</strong></div>
+    </div>
+
+    <!-- Performance summary panel (pptx style) -->
+    <div class="panel" style="margin-bottom:28px">
+      <h3>Hatékonysági mutatók és trendek</h3>
+      <div class="panel-sub">Facebook Advantage+ Sales kampány · mosodepo.hu</div>
+      <p>A vizsgált időszakban a Meta hirdetések egyértelműen a Mosódepó webshop értékesítési céljait szolgálták, és a kampányteljesítmény alapján jól látható, hogy a rendszer stabilan működik. A Mosodeop | Adv+ Sales | 0402 kampány összesen <strong>962 893 megjelenést</strong> és <strong>214 559 elérést</strong> generált — ez kiemelkedő nézettséget jelent.</p>
+      <p>A kampány <strong>307 webes kosárba helyezést</strong> és <strong>75 webes vásárlást</strong> eredményezett, miközben a teljes költés <strong>615 485 Ft</strong> volt. Az egy vásárlásra jutó költség <strong>8 207 Ft</strong>, ami a webshop átlagos kosárértékéhez viszonyítva kedvező értéknek számít. A vásárlások összesített konverziós értéke <strong>1 735 181 Ft</strong> volt, az átlagos vásárlási érték pedig <strong>23 136 Ft</strong> körül alakult. A <strong>2,82-es ROAS</strong> azt jelenti, hogy minden hirdetésre fordított 1 Ft közel 3 Ft bevételt termelt.</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card highlight" style="--brand-accent:var(--md-yellow)">
+        <div class="kpi-lbl">ROAS</div>
+        <div class="kpi-val">2,82<span class="kpi-unit">×</span></div>
+        <div class="kpi-sub">Minden 1 Ft hirdetésre 2,82 Ft bevétel</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költés</div>
+        <div class="kpi-val">615 485<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">Teljes hirdetési büdzsé az időszakban</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Konverziós érték</div>
+        <div class="kpi-val">1 735 181<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">A vásárlások összesített bevétele</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Webes vásárlás</div>
+        <div class="kpi-val">75</div>
+        <div class="kpi-sub">Átlagos kosárérték: 23 136 Ft</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Megjelenés</div>
+        <div class="kpi-val">962 893</div>
+        <div class="kpi-sub">214 559 különböző ember látta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kattintás</div>
+        <div class="kpi-val">17 791</div>
+        <div class="kpi-sub">CTR 1,85% · átlagos kattintási költség 35 Ft</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kosárba helyezés</div>
+        <div class="kpi-val">307</div>
+        <div class="kpi-sub">Ebből 24% lett vásárlás</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költség egy vásárlásra</div>
+        <div class="kpi-val">8 207<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">1000 megjelenés ára (CPM): 639 Ft</div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <h3>Hirdetési útvonal — a megjelenéstől a vásárlásig</h3>
+        <div class="panel-sub">Hogyan halad a felhasználó a hirdetésen át</div>
+        <p>A Mosódepó Advantage+ Sales kampány a portfólió legnagyobb volumenű kampánya — közel 1 millió megjelenés és csaknem 18 ezer kattintás. A „kosárba helyezésből vásárlássá" váló arány <strong>24%</strong>, ami azt jelenti, hogy a kosárba helyezések negyede zárul tényleges vásárlással. Az értékesítés volumene szempontjából a Mosódepó az időszak legmagasabb bevételét generálta a portfólióban.</p>
+        <div class="funnel">
+          <div class="funnel-row"><span class="lbl">Megjelenés</span><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,var(--md-yellow) 0%,rgba(255,174,16,0.1) 100%)"></div><span class="num">962 893</span></div>
+          <div class="funnel-row"><span class="lbl">Elérés</span><div class="funnel-bar" style="width:22%;background:linear-gradient(90deg,var(--md-yellow) 0%,rgba(255,174,16,0.1) 100%)"></div><span class="num">214 559</span></div>
+          <div class="funnel-row"><span class="lbl">Kattintás</span><div class="funnel-bar" style="width:5%;background:linear-gradient(90deg,var(--md-yellow) 0%,rgba(255,174,16,0.1) 100%)"></div><span class="num">17 791</span></div>
+          <div class="funnel-row"><span class="lbl">Kosárba helyezés</span><div class="funnel-bar" style="width:1.2%;background:linear-gradient(90deg,var(--md-yellow) 0%,rgba(255,174,16,0.1) 100%)"></div><span class="num">307</span></div>
+          <div class="funnel-row"><span class="lbl">Vásárlás</span><div class="funnel-bar" style="width:0.3%;background:linear-gradient(90deg,var(--md-yellow) 0%,rgba(255,174,16,0.1) 100%)"></div><span class="num">75</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Hirdetési költés és bevétel</h3>
+        <div class="panel-sub">A hirdetésekre fordított összeg és az ebből származó vásárlások értéke</div>
+        <p>A Mosódepó kampány <strong>615 485 Ft</strong> hirdetési költésből összesen <strong>1 735 181 Ft</strong> bevételt termelt a webshopon. Ez azt jelenti, hogy a kampány közel háromszorosan térült meg — minden hirdetésre fordított 1 Ft 2,82 Ft árbevételt hozott. Volumen szempontjából a Mosódepó adja a portfólió legmagasabb hirdetésből származó bevételét.</p>
+        <div class="chart-wrap">
+          <canvas id="md-cost-revenue-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendations">
+      <h3 style="font-size:20px;font-weight:700;margin:0 0 18px;color:#fff">Következő lépések</h3>
+
+      <div class="rec-item" style="--brand-accent:var(--md-yellow)">
+        <div class="num">1</div>
+        <div>
+          <h4>Új kreatívok folyamatos gyártása</h4>
+          <p>A kampány nézettsége (közel 1 millió megjelenés) és gyakorisága (4,49) azt jelzi, hogy a célközönség nagy részét már elértük az időszakban. Ahhoz, hogy a hirdetések friss üzenetet közvetítsenek és a teljesítmény stabil maradjon, érdemes a kreatívokat rendszeresen frissíteni, és új termékfókuszú variációkat tesztelni.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--md-yellow)">
+        <div class="num">2</div>
+        <div>
+          <h4>Kosárelhagyás csökkentése</h4>
+          <p>A kosárba helyezett termékek <strong>24%-a</strong> vált tényleges vásárlássá. Ez azt jelenti, hogy minden négy kosárba kerülő termékből három még a vásárlás előtt elveszik. Egy automatizált kosárelhagyási e-mail folyamat bevezetésével ez az arány jelentősen javítható, és ugyanannyi hirdetési költés mellett több vásárlást lehet generálni.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--md-yellow)">
+        <div class="num">3</div>
+        <div>
+          <h4>UGC (valós használati) videós tartalmak</h4>
+          <p>A Mosódepó saját autókozmetika stúdiójának hitelességére építve érdemes valós helyzetekben bemutató videós kreatívokat készíteni. Az ilyen tartalmak a tapasztalat szerint látványosan jobban teljesítenek a hagyományos termékképekhez képest, és magasabb kattintási arányt érnek el.</p>
+        </div>
+      </div>
+
+      <div class="rec-item" style="--brand-accent:var(--md-yellow)">
+        <div class="num">4</div>
+        <div>
+          <h4>Kampány büdzsé skálázása</h4>
+          <p>A 2,82-szeres megtérülés mellett a kampány büdzsét lépésről lépésre lehet emelni anélkül, hogy a hatékonyság érdemben csökkenne. Először kisebb lépésekben javasolt emelni, a teljesítményt heti szinten követve.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ SIPOM SECTION ============ -->
+<section class="brand-section visible" id="section-sipom" data-brand="sipom">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div>
+        <div class="section-logo logo-sipom"><img src="https://www.sipom.it/assets/images/logo.png" alt="Sipom"></div>
+        <h2>Sipom — <em style="color:var(--sipom-light)">B2B érdeklődő kampány</em></h2>
+      </div>
+      <div class="meta">Kampány: <strong style="color:#fff">Sipom | B2B | Lead</strong></div>
+    </div>
+
+    <!-- Performance summary panel (pptx style) -->
+    <div class="panel" style="margin-bottom:28px">
+      <h3>Hatékonysági mutatók és trendek</h3>
+      <div class="panel-sub">Sipom B2B érdeklődőszerző kampány · sipom.hu</div>
+      <p>A vizsgált időszakban a Sipom B2B Lead kampány a detailing szakemberek és viszonteladók megszólítását szolgálta, és a kampányteljesítmény alapján jól látható, hogy a célzás pontosan találja a megfelelő közönséget. A kampány összesen <strong>74 196 megjelenést</strong> és <strong>30 472 elérést</strong> generált.</p>
+      <p>A kampány <strong>64 érdeklődőt (lead)</strong> hozott, miközben a teljes költés <strong>71 550 Ft</strong> volt. Az egy érdeklődőre jutó költség így <strong>1 118 Ft</strong>, ami B2B szegmensben kifejezetten kedvező értéknek számít. A <strong>2,01%-os átkattintási arány (CTR)</strong> erős teljesítményt jelez, és azt mutatja, hogy a kampány üzenete relevánsan szólítja meg a célközönséget. A kattintásból érdeklődővé válás aránya <strong>4,29%</strong> — vagyis minden 23. kattintó B2B megkereséssé alakult.</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card highlight kpi-sipom">
+        <div class="kpi-lbl">B2B érdeklődő (lead)</div>
+        <div class="kpi-val">64</div>
+        <div class="kpi-sub">Detailing szakemberek megkeresése</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költség egy érdeklődőre</div>
+        <div class="kpi-val">1 118<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">B2B szegmensben kedvező érték</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Költés</div>
+        <div class="kpi-val">71 550<span class="kpi-unit">Ft</span></div>
+        <div class="kpi-sub">Teljes hirdetési büdzsé az időszakban</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Átkattintási arány (CTR)</div>
+        <div class="kpi-val">2,01<span class="kpi-unit">%</span></div>
+        <div class="kpi-sub">Erős teljesítmény a B2B szegmensben</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Megjelenés</div>
+        <div class="kpi-val">74 196</div>
+        <div class="kpi-sub">30 472 különböző ember látta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kattintás</div>
+        <div class="kpi-val">1 491</div>
+        <div class="kpi-sub">Átlagos kattintási költség: 48 Ft</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Megjelenési gyakoriság</div>
+        <div class="kpi-val">2,43</div>
+        <div class="kpi-sub">Átlagosan ennyiszer látta egy ember</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-lbl">Kattintásból érdeklődő</div>
+        <div class="kpi-val">4,29<span class="kpi-unit">%</span></div>
+        <div class="kpi-sub">Magas konverziós arány — releváns landing oldal</div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <h3>Hirdetési útvonal — a megjelenéstől az érdeklődőig</h3>
+        <div class="panel-sub">Hogyan halad a felhasználó a hirdetésen át</div>
+        <p>A Sipom B2B Lead kampány <strong>2,01% átkattintási aránnyal</strong> futott — ez a B2B szegmensben kifejezetten erős érték. A magas CTR azt jelzi, hogy a hirdetési üzenet pontosan szólítja meg a detailing szakembereket. A kattintás után <strong>4,29%-os arányban</strong> váltak ténylegesen érdeklődővé a látogatók, ami szintén magas konverziós szint a B2B kategóriában.</p>
+        <div class="funnel">
+          <div class="funnel-row"><span class="lbl">Megjelenés</span><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,var(--sipom-mid) 0%,rgba(23,48,87,0.15) 100%)"></div><span class="num">74 196</span></div>
+          <div class="funnel-row"><span class="lbl">Elérés</span><div class="funnel-bar" style="width:41%;background:linear-gradient(90deg,var(--sipom-mid) 0%,rgba(23,48,87,0.15) 100%)"></div><span class="num">30 472</span></div>
+          <div class="funnel-row"><span class="lbl">Kattintás</span><div class="funnel-bar" style="width:2%;background:linear-gradient(90deg,var(--sipom-mid) 0%,rgba(23,48,87,0.15) 100%)"></div><span class="num">1 491</span></div>
+          <div class="funnel-row"><span class="lbl">Érdeklődő (lead)</span><div class="funnel-bar" style="width:0.09%;background:linear-gradient(90deg,var(--sipom-mid) 0%,rgba(23,48,87,0.15) 100%)"></div><span class="num">64</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Átkattintási arány — márkák összehasonlítása</h3>
+        <div class="panel-sub">CTR a portfólió kampányai között</div>
+        <p>A Sipom kampány érte el a portfólió legmagasabb átkattintási arányát az időszakban. Az érték érzékelhetően magasabb, mint a Mosódepó B2C (1,85%) vagy a Neptun Globe B2B (1,59%) szint — ami azt mutatja, hogy a Sipom célzása pontos, és a megjelenített hirdetések üzenete relevánsan szól a detailing szakemberekhez.</p>
+        <div class="chart-wrap">
+          <canvas id="sipom-ctr-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendations">
+      <h3 style="font-size:20px;font-weight:700;margin:0 0 18px;color:#fff">Következő lépések</h3>
+
+      <div class="rec-item rec-sipom">
+        <div class="num">1</div>
+        <div>
+          <h4>Kampány büdzsé fokozatos emelése</h4>
+          <p>A 64 érdeklődő és az <strong>1 118 Ft-os érdeklődőre jutó költség</strong> kifejezetten kedvező a B2B szegmensben. A kampány teljesítménye stabil, így a következő hetekben javasolt a büdzsé fokozatos, kisebb lépésekben történő emelése. Ezzel több potenciális üzleti megkeresés érhető el ugyanolyan hatékonyság mellett.</p>
+        </div>
+      </div>
+
+      <div class="rec-item rec-sipom">
+        <div class="num">2</div>
+        <div>
+          <h4>Új videós kreatívok élesítése</h4>
+          <p>A jelenlegi képi kreatívok mellett érdemes videós tartalmakkal is bővíteni a kampányt — különösen termékhasználati bemutatókkal (felnitisztító, koncentrátum arányok). A videós formátum a tapasztalat szerint magasabb figyelmet vonz és jobb minőségű érdeklődőket eredményez B2B szegmensben.</p>
+        </div>
+      </div>
+
+      <div class="rec-item rec-sipom">
+        <div class="num">3</div>
+        <div>
+          <h4>Célközönség finomítása</h4>
+          <p>A jelenlegi egységes B2B detailing célközönségen belül érdemes elkülönített hirdetési csoportokat indítani: külön a koncentrátum-vásárlókra (autómosók, autókozmetikák) és külön a késztermék-vásárlókra. Ezzel a két szegmens más-más üzenetet kaphat, és a kampány hatékonysága tovább növelhető.</p>
+        </div>
+      </div>
+
+      <div class="rec-item rec-sipom">
+        <div class="num">4</div>
+        <div>
+          <h4>Érdeklődők gyors követése</h4>
+          <p>A B2B érdeklődőknél kulcsfontosságú a gyors visszahívás vagy email követés a megkereséstől számított 24 órán belül. Egy automatizált követési folyamat kiépítésével (üdvözlő email + felajánlott időpont egy konzultációra) jelentősen növelhető az érdeklődőből vásárlóvá váló arány.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section class="glossary-section" id="glossary">
+  <div class="wrap">
+    <details class="glossary-details">
+      <summary>
+        <span class="g-icon" aria-hidden="true">?</span>
+        <span class="g-title">Magyarázat — mit jelentenek a riportban szereplő mutatók?</span>
+        <span class="g-chevron" aria-hidden="true">▾</span>
+      </summary>
+      <div class="glossary-grid">
+        <div class="g-item">
+          <h4>ROAS (megtérülési mutató)</h4>
+          <p>Megmutatja, hogy minden 1 Ft hirdetési költés mennyi árbevételt termel. Például egy <strong>4-es ROAS</strong> azt jelenti, hogy minden 1 Ft hirdetésre 4 Ft bevétel jött vissza a webshopból.</p>
+        </div>
+        <div class="g-item">
+          <h4>Konverziós érték</h4>
+          <p>A hirdetésekből származó vásárlások összesített forintban kifejezett értéke az adott időszakban.</p>
+        </div>
+        <div class="g-item">
+          <h4>Megjelenés</h4>
+          <p>Hányszor jelent meg összesen a hirdetés a Facebook és Instagram felületein. Ugyanaz az ember többször is láthatja, ezért magasabb szám, mint az elérés.</p>
+        </div>
+        <div class="g-item">
+          <h4>Elérés</h4>
+          <p>Hány <strong>különböző</strong> ember látta legalább egyszer a hirdetést. Ez a tényleges egyedi nézői szám.</p>
+        </div>
+        <div class="g-item">
+          <h4>Megjelenési gyakoriság (frequency)</h4>
+          <p>Átlagosan hányszor látta ugyanaz az ember a hirdetést. Ha túl magas (5 felett), érdemes új kreatívot betenni, mert a közönség kezd „elfáradni".</p>
+        </div>
+        <div class="g-item">
+          <h4>Kattintás</h4>
+          <p>Hányszor kattintottak a hirdetésre. Innen a felhasználó a webshopba érkezik.</p>
+        </div>
+        <div class="g-item">
+          <h4>Átkattintási arány (CTR)</h4>
+          <p>A kattintások aránya a megjelenésekhez képest, százalékban. Magyar piacon a <strong>1,5–2,5%</strong> általában jó értéknek számít.</p>
+        </div>
+        <div class="g-item">
+          <h4>CPC (kattintási költség)</h4>
+          <p>Egy kattintás átlagos költsége. Minél alacsonyabb, annál olcsóbban tudjuk a webshopba terelni a látogatókat.</p>
+        </div>
+        <div class="g-item">
+          <h4>CPM (1000 megjelenés ára)</h4>
+          <p>Ennyibe kerül 1000 megjelenés átlagosan. Akkor hasznos összehasonlítani, ha különböző közönségeken futtatunk hirdetést.</p>
+        </div>
+        <div class="g-item">
+          <h4>Kosárba helyezés</h4>
+          <p>Hányszor tettek terméket a kosárba a hirdetésre kattintó látogatók. Még nem vásárlás — viszont fontos köztes lépés.</p>
+        </div>
+        <div class="g-item">
+          <h4>Webes vásárlás</h4>
+          <p>Hány tényleges, lezárt vásárlás történt a webshopban a hirdetés hatására.</p>
+        </div>
+        <div class="g-item">
+          <h4>Költség egy vásárlásra</h4>
+          <p>A teljes hirdetési költés osztva a vásárlások számával. Megmutatja, hogy átlagosan mennyibe kerül egy új vásárló megszerzése a hirdetésekből.</p>
+        </div>
+        <div class="g-item">
+          <h4>Lead (érdeklődő)</h4>
+          <p>Olyan B2B megkeresés, ahol a látogató pl. űrlapot tölt ki vagy árajánlatot kér. Nem azonnali vásárlás, hanem üzleti érdeklődés.</p>
+        </div>
+        <div class="g-item">
+          <h4>Költség egy érdeklődőre</h4>
+          <p>A hirdetési költés osztva a beérkezett érdeklődések számával. Megmutatja, hogy átlagosan mennyibe kerül egy új B2B megkeresés.</p>
+        </div>
+        <div class="g-item">
+          <h4>Munkamenet (session)</h4>
+          <p>Egy látogatás a weboldalon — egy felhasználó több munkamenetet is generálhat, ha többször visszatér.</p>
+        </div>
+        <div class="g-item">
+          <h4>Aktív felhasználó</h4>
+          <p>Olyan különböző látogató, aki ténylegesen használta a webshopot (nem csak megnyitotta és bezárta).</p>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <p>Riport generálva: 2026. május 14. · Időszak: 2026. április 1. – 2026. május 14. · Adatforrás: Meta Ads, Google Analytics</p>
+    <img src="https://cdn.prod.website-files.com/67696bf6a7f399ccfcfd653f/676976986befa745c559cddd_Dropline_logo_web.png" alt="dropline">
+  </div>
+</footer>
+
+<script>
+/* ============ CURSOR AURA (rAF-throttled transform) ============ */
+const aura = document.querySelector('.cursor-aura');
+let auraX = window.innerWidth/2, auraY = window.innerHeight*0.3, auraScheduled = false;
+function _auraTick(){
+  aura.style.transform = `translate3d(${auraX}px, ${auraY}px, 0)`;
+  auraScheduled = false;
+}
+document.addEventListener('pointermove', e => {
+  auraX = e.clientX; auraY = e.clientY;
+  if(!auraScheduled){ auraScheduled = true; requestAnimationFrame(_auraTick); }
+}, {passive:true});
+_auraTick();
+
+/* ============ BRAND FILTER ============ */
+const tabs = document.querySelectorAll('.brand-tab');
+const sections = document.querySelectorAll('.brand-section');
+const summaryStrip = document.getElementById('summary-strip');
+const heroEm = document.querySelector('.hero h1 em');
+
+function setBrand(brand){
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.brand === brand));
+  document.body.className = 'brand-active-' + brand;
+
+  if(brand === 'all'){
+    summaryStrip.style.display = 'grid';
+    sections.forEach(s => s.classList.add('visible'));
+  } else {
+    summaryStrip.style.display = 'none';
+    sections.forEach(s => {
+      s.classList.toggle('visible', s.dataset.brand === brand);
+    });
+  }
+
+  // Scroll to top of brand section if filtered
+  if(brand !== 'all'){
+    const target = document.querySelector(`.brand-section[data-brand="${brand}"]`);
+    if(target){
+      setTimeout(() => {
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+      }, 100);
+    }
+  } else {
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => setBrand(tab.dataset.brand));
+});
+
+/* ============ CHART.JS DEFAULTS ============ */
+Chart.defaults.color = 'rgba(255,255,255,0.7)';
+Chart.defaults.font.family = "'Satoshi','Inter',sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+
+const tooltipStyle = {
+  backgroundColor: 'rgba(20,20,20,0.96)',
+  titleColor: '#fff',
+  bodyColor: '#fff',
+  borderColor: 'rgba(255,255,255,0.18)',
+  borderWidth: 1,
+  padding: 12,
+  cornerRadius: 10,
+  titleFont: {weight: '700', size: 13},
+  bodyFont: {size: 12},
+  displayColors: true
+};
+
+/* ============ NG: TRAFFIC SOURCE CHART (donut) ============ */
+new Chart(document.getElementById('ng-traffic-chart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook fizetett', 'Facebook remarketing', 'neptunglobe.hu hivatkozás', 'Közvetlen látogatás', 'Egyéb'],
+    datasets: [{
+      data: [1676, 572, 693, 212, 451],
+      backgroundColor: ['#00CC0A', '#00A308', '#FFAE10', '#9bb3dc', '#6b6b6b'],
+      borderColor: '#141414',
+      borderWidth: 3,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {boxWidth:12, padding:14, font:{size:11.5}}
+      },
+      tooltip: {
+        ...tooltipStyle,
+        callbacks: {
+          label: ctx => `${ctx.label}: ${ctx.parsed.toLocaleString('hu-HU')} felhasználó`
+        }
+      }
+    }
+  }
+});
+
+/* Hungarian county map removed by client request — region breakdown is rendered as a two-column list in the HTML */
+
+
+/* ============ MOSÓDEPÓ: Cost vs revenue chart ============ */
+new Chart(document.getElementById('md-cost-revenue-chart'), {
+  type: 'bar',
+  data: {
+    labels: ['Hirdetési költés', 'Bevétel a hirdetésekből'],
+    datasets: [{
+      data: [615485, 1735181],
+      backgroundColor: ['rgba(255,77,77,0.55)', 'rgba(255,174,16,0.85)'],
+      borderColor: ['#FF4D4D', '#FFAE10'],
+      borderWidth: 1,
+      borderRadius: 10,
+      barThickness: 64
+    }]
+  },
+  options: {
+    responsive:true,
+    maintainAspectRatio:false,
+    indexAxis:'y',
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        ...tooltipStyle,
+        callbacks:{
+          label: ctx => `${ctx.parsed.x.toLocaleString('hu-HU')} Ft`
+        }
+      }
+    },
+    scales:{
+      x:{
+        beginAtZero:true,
+        grid:{color:'rgba(255,255,255,0.05)'},
+        ticks:{
+          font:{size:11},
+          callback: v => (v/1000).toFixed(0) + 'k Ft'
+        }
+      },
+      y:{grid:{display:false},ticks:{font:{size:12,weight:600}}}
+    }
+  }
+});
+
+/* ============ SIPOM: CTR comparison chart ============ */
+new Chart(document.getElementById('sipom-ctr-chart'), {
+  type: 'bar',
+  data: {
+    labels: ['Sipom (B2B)', 'Mosódepó (B2C)', 'Neptun Globe (B2B)'],
+    datasets: [{
+      label: 'Átkattintási arány (%)',
+      data: [2.01, 1.85, 1.59],
+      backgroundColor: ['rgba(70,116,175,0.85)', 'rgba(255,174,16,0.7)', 'rgba(0,204,10,0.7)'],
+      borderColor: ['#4674AF','#FFAE10','#00CC0A'],
+      borderWidth: 1,
+      borderRadius: 8,
+      barThickness: 56
+    }]
+  },
+  options: {
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        ...tooltipStyle,
+        callbacks:{
+          label: ctx => `${ctx.parsed.y}% CTR`
+        }
+      }
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:11.5,weight:600}}},
+      y:{
+        beginAtZero:true,
+        max:2.5,
+        grid:{color:'rgba(255,255,255,0.05)'},
+        ticks:{font:{size:11},callback: v => v + '%'}
+      }
+    }
+  }
+});
+
+/* ============ INITIAL STATE ============ */
+setBrand('all');
+// Override the scroll-to-top from setBrand on initial load
+window.scrollTo({top:0,behavior:'instant'});
+
+</script>
+</body>
+</html>
